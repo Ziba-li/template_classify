@@ -1,0 +1,14 @@
+datasets
+scipy
+transformers
+torch
+fire
+onnxruntime
+onnxruntime-tools
+textbrewer
+sklearn
+zhconv
+uvicorn
+fastapi
+loguru
+tqdm
