@@ -116,17 +116,33 @@ index	sentence	label
 
 ### 4.4 模型剪裁
 
-试验完成后再写。
+模型剪裁采用：https://github.com/airaria/TextPruner
 
+经实验后证明，模型体积可适当减少，并且性能也相对较快。
 
+具体裁剪参数：
+
+- transformer裁剪中：`target_ffn_size=1536, target_num_of_heads=6` 精度损耗较为严重，即使设置32轮迭代依旧很低，建议采用：`target_ffn_size=2048, target_num_of_heads=8` 
+
+> 每次裁剪完成后需通过 `optimize`文件夹下的 `evaluate`文件夹下的 `evaluate_pytorch.py` 文件。
 
 ### 4.5 评估
 
-此处评估均基于 `ONNX` 模型：`optimize` 文件夹下的 `evaluate_onnx.py` 文件
+#### 4.5.1 `ONNX`
 
-> 需要设定待评估的 `onnx` 模型**文件路径**，以及评估数据**文件路径**
+1. 评估模型准确率：`optimize` 文件夹下的 `evaluate` 文件夹下的 `evaluate_onnx.py`
 
-对于优化后模型，需要进行评测，得出每次优化后的评价指标的变化，用于最终的模型决策。
+   > 填写需要评估的 `.onnx` 模型**文件路径**，以及 `验证数据` **文件路径**。
+
+2. 评估模型性能：pass
+
+#### 4.5.2 `Pytorch` 
+
+1. `optimize` 文件夹下的 `evaluate` 文件夹下的 `evaluate_pytorch.py`
+
+   > 填写需要评估的 `pytorch` 模型**文件夹路径**，以及 `验证数据` **文件路径**。
+
+2. 评估模型性能：pass
 
 # 5. 部署
 
@@ -173,8 +189,6 @@ index	sentence	label
   ~~~
 
   
-
-
 
 
 

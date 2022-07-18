@@ -12,3 +12,4 @@ uvicorn
 fastapi
 loguru
 tqdm
+textpruner
