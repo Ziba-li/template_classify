@@ -2,10 +2,12 @@
 import abc
 import torch
 import pandas as pd
-from typing import List
-from transformers import BertTokenizerFast
-from torch.utils.data import DataLoader, Dataset
-
+from typing import List, Tuple, Union
+from transformers import BertTokenizerFast, BertForSequenceClassification
+from torch.utils.data import Dataset
+from textpruner import inference_time
+from onnx_performance_time import InfluenceONNXTime as Iot
+from transformers.tokenization_utils_base import BatchEncoding
 device = torch.device(f"cuda:0" if torch.cuda.is_available() else "cpu")
 
 
@@ -21,7 +23,7 @@ class TestDataset(Dataset):
         return self.text_2_id(line)
 
     @staticmethod
-    def text_2_id(text: str):
+    def text_2_id(text: str or List[str]):
         tokenizer = BertTokenizerFast(vocab_file="../../deploy/vocab.txt", do_lower_case=True)
         return tokenizer(text, max_length=128, truncation=True,
                          padding='max_length', return_tensors='pt').to(device)
@@ -47,3 +49,20 @@ class EvaluateFactory:
                 true_counter += 1
         accuracy_number = true_counter / len(predicted_result) * 100
         return accuracy_number
+
+    def evaluate_performance_and_accuracy(self, test_file: str, dummy_inputs: BatchEncoding,
+                                          model: Union[BertForSequenceClassification, None],
+                                          inference_time_function: Union[inference_time, Iot.calculate_inference_time],
+                                          performance: bool = True, accuracy: bool = True,
+                                          batch_size=128) -> Tuple[Union[str, None], Union[str, None], Union[str, None]]:
+
+        if accuracy:
+            acc = self.evaluate_predict_result(test_file, batch_size)
+        else:
+            acc = None
+        if performance:
+            mean, std = inference_time_function(model, dummy_inputs)
+        else:
+            mean, std = None, None
+
+        return f"accuracy：{acc}", f"Mean inference time: {mean:.2f}ms", f"Standard deviation: {std:.2f}ms"
