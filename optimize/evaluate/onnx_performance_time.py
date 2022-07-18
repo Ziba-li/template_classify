@@ -5,8 +5,6 @@ from transformers.tokenization_utils_base import BatchEncoding
 from onnxruntime.capi.onnxruntime_inference_collection import InferenceSession
 from tqdm import tqdm
 
-device = torch.device(f"cuda:0" if torch.cuda.is_available() else "cpu")
-
 
 class InfluenceONNXTime:
     def __init__(self, session: InferenceSession, warm_up: int = 5, repetitions: int = 10):
@@ -15,7 +13,7 @@ class InfluenceONNXTime:
         self.repetitions = repetitions
 
     def __influence(self, test_inputs):
-        if device == "cpu":
+        if not torch.cuda.is_available():
             logits = self.session.run(None, {
                 'input_ids': test_inputs['input_ids'].squeeze(1).numpy(),
                 'input_mask': test_inputs['attention_mask'].squeeze(1).numpy(),
